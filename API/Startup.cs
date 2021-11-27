@@ -16,6 +16,7 @@ using Microsoft.OpenApi.Models;
 
 namespace API
 {
+    // Used to start up our Web API project with its dependencies etc.
     public class Startup
     {
         private readonly IConfiguration _config;
@@ -26,15 +27,18 @@ namespace API
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        // (Dependency injection)
+        // (Dependency injection) -- we add
         public void ConfigureServices(IServiceCollection services)
         {
+            // Configure sqlite
             services.AddDbContext<DataContext>(options =>
             {
                 // We use config. file (from app settings dev) to init. our db connection
                 options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
             });
             services.AddControllers();
+            // Add cors
+            services.AddCors();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIv5", Version = "v1" });
@@ -42,7 +46,7 @@ namespace API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline. 
-        // Middleware
+        // Middleware -- we use/setup
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -57,7 +61,9 @@ namespace API
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseCors(policy => policy.AllowAnyHeader()
+                                        .AllowAnyMethod()
+                                        .WithOrigins("http://localhost:4200"));
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

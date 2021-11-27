@@ -11,6 +11,7 @@ namespace API
 {
     public class Program
     {
+        // Our program creates and startups our app.
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
