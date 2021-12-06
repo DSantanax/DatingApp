@@ -3,6 +3,10 @@
 # ssl cert. for local dev.
 /ssl
 
+# DB Sqlite files
+./API/datingapp.db-shm
+./API/datingapp.db-wal
+
 # compiled output
 /dist
 /tmp
