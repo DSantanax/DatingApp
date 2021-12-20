@@ -16,6 +16,7 @@ namespace API.Controllers
             _context = context;
         }
         // attr. binds the params from the method to the data
+        // Takes in a register object
         [HttpPost("register")]
         public async Task<ActionResult<AppUser>> Register(RegisterDto registerDto)
         {
@@ -38,6 +39,28 @@ namespace API.Controllers
             _context.Add(user);
             // Add to DB async.
             await _context.SaveChangesAsync();
+            return user;
+        }
+        [HttpPost("login")]
+        public async Task<ActionResult<AppUser>> Login(LoginDto loginDto)
+        {            
+            using var hmac = new HMACSHA512();
+            // get user
+            var user = await _context.Users.SingleOrDefaultAsync(user => user.UserName == loginDto.Username.ToLower());
+            if (user == null) return Unauthorized("Invalid username and/or password.");
+            // user is found, set salt
+            hmac.Key = user.PasswordSalt;
+            // hash password
+            byte[] hashPass = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
+            // compare hashes
+            for(int i = 0; i < hashPass.Length; i++)
+            {
+                if(hashPass[i] != user.PasswordHash[i])
+                {
+                    return Unauthorized("Invalid username and/or password.");
+                }
+            }
+            // same pass, successful login
             return user;
         }
         // Check if username already exists
