@@ -14,7 +14,7 @@ namespace API.Services
         // Use IConfig to set our key
         public TokenService(IConfiguration config)
         {
-            // set our symm. key from the config file
+            // set our symm. key from the config file (appsettings.json)
             // the key will be a string -- but we use Bytes for the algo.
             _symmKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
         }
@@ -27,7 +27,7 @@ namespace API.Services
                 new Claim(JwtRegisteredClaimNames.NameId, user.UserName)
             };
             // info. of our signing sig.
-            var creds = new SigningCredentials(_symmKey, "HMACSHA512");
+            var creds = new SigningCredentials(_symmKey, SecurityAlgorithms.HmacSha512Signature);
             // Our main token credentials (claims - payload , headers - type , and sig)
             var tokenDesc = new SecurityTokenDescriptor
             {

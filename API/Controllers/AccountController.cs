@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -11,14 +12,17 @@ namespace API.Controllers
     public class AccountController : BaseApiController
     {
         private readonly DataContext _context;
-       public AccountController(DataContext context)
+        private readonly ITokenService _tokenService;
+        // Dependency injection
+       public AccountController(DataContext context, ITokenService tokenService)
         {
             _context = context;
+            _tokenService = tokenService;
         }
         // attr. binds the params from the method to the data
         // Takes in a register object
         [HttpPost("register")]
-        public async Task<ActionResult<AppUser>> Register(RegisterDto registerDto)
+        public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
             // Check if username already exists in db
             if (await UserExists(registerDto.Username))
@@ -39,10 +43,14 @@ namespace API.Controllers
             _context.Add(user);
             // Add to DB async.
             await _context.SaveChangesAsync();
-            return user;
+            return new UserDto
+            {
+                Username = user.UserName,
+                Token = _tokenService.CreateToken(user)
+            };
         }
         [HttpPost("login")]
-        public async Task<ActionResult<AppUser>> Login(LoginDto loginDto)
+        public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {            
             using var hmac = new HMACSHA512();
             // get user
@@ -61,7 +69,11 @@ namespace API.Controllers
                 }
             }
             // same pass, successful login
-            return user;
+            return new UserDto
+            {
+                Username = user.UserName,
+                Token = _tokenService.CreateToken(user)
+            };
         }
         // Check if username already exists
         private async Task<bool> UserExists(string username)
