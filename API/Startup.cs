@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using API.Data;
+using API.Extensions;
 using API.Interfaces;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -35,28 +36,14 @@ namespace API
         // (Dependency injection) -- we add
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add our created services
-            services.AddScoped<ITokenService, TokenService>();
-            // Configure sqlite
-            services.AddDbContext<DataContext>(options =>
-            {
-                // We use config. file (from app settings dev) to init. our db connection
-                options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
-            });
+            // Use an extension method of IServiceCollection to add app. services
+            // we create
+            services.AddApplicationServices(_config);
             services.AddControllers();
             // Add cors
             services.AddCors();
-            // Add service authentication scheme for jwt tokens
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true, // server will sign and validate the token using provided key
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["TokenKey"])),
-                    ValidateIssuer = false, // api server, issuer who assigned jwt
-                    ValidateAudience = false, // client app (Angular)
-                };
-            });
+            // Add identity related services - extension method
+            services.AddIdentityServices(_config);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIv5", Version = "v1" });
