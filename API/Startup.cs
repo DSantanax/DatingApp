@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using API.Data;
 using API.Interfaces;
+using API.MIddleware;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -67,9 +68,13 @@ namespace API
         // Middleware -- we use/setup
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Register own middleware exception handler
+            app.UseMiddleware<ExceptionMiddleware>();
+            // TODO check components remove?, take notes on adding to Configure in udemy
+
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                // app.UseDeveloperExceptionPage(); -- Using own middleware exception
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv5 v1"));
             }
