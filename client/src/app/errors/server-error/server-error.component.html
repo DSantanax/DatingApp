@@ -1,0 +1,8 @@
+<div class="container">
+  <h3>Interal server error.</h3>
+  <ng-container *ngIf="error">
+    <p class="text-danger">Error: {{error.message}} {{error.statusCode}}</p>
+    <p>Stack trace:</p>
+    <code style="background-color: whitesmoke"> {{error.details}} </code>
+  </ng-container>
+</div>
