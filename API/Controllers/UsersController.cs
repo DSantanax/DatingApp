@@ -1,34 +1,38 @@
 ﻿using API.Data;
+using API.DTOs;
 using API.Entities;
+using API.Interfaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
-{
+{   
+    [Authorize]
     public class UsersController : BaseApiController
     {
-        private readonly DataContext _context;
-
-        public UsersController(DataContext context)
+        private readonly IUserRepository _repo;
+        private readonly IMapper _mapper;
+        public UsersController(IUserRepository repo, IMapper mapper)
         {
-            _context = context;
+            _repo = repo;
+            _mapper = mapper;
         }
         // api/users
         // attributes from Auth. package for JWT auth.
-        [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
         {
-            return await _context.Users.ToListAsync() ;
+            return Ok(await _repo.GetMembersAsync());
+            // Wrap IEnum to Ok object 
         }
         // add params
         // api/users/3
-        [Authorize]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<AppUser>> GetUser(int id)
-        { 
-            return await _context.Users.FindAsync(id);
+        [HttpGet("{username}")]
+        public async Task<ActionResult<MemberDto>> GetUser(string username)
+        {
+            return await _repo.GetMemberAsync(username);
         }
     }
 }
