@@ -1,1 +1,5 @@
-<p>member-list works!</p>
+<div class="row">
+  <div class="col-2">
+    <img *ngFor="let member of members" src="{{member.photoUrl}}" alt="Profile image" />
+  </div>
+</div>
