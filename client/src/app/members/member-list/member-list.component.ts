@@ -11,7 +11,7 @@ export class MemberListComponent implements OnInit {
   members: Member[];
 
 
-  constructor(private memberServce: MembersService) { }
+  constructor(private memberService: MembersService) { }
 
   ngOnInit(): void {
     this.loadMembers();
@@ -19,7 +19,7 @@ export class MemberListComponent implements OnInit {
   }
 
   loadMembers() {
-    this.memberServce.getMembers().subscribe((members) => {
+    this.memberService.getMembers().subscribe((members) => {
       this.members = members;
       console.log(this.members);
     })
