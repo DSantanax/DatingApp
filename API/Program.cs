@@ -32,7 +32,7 @@ namespace API
             {
                 // Logger service to log errors
                 ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(err, "An error occured during migration.");
+                logger.LogError(err, "An error occurred during migration.");
             }
             await host.RunAsync();
         }
